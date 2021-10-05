@@ -56,13 +56,13 @@ end
 -------------------------------------
 
 ---------- git links -----------
-local function git_link(args)
+local function git_stuff(args)
 	return require('plenary.job'):new({ command = 'git', args = args }):sync()[1]
 end
 
-local function git_url() return git_link({ 'config', '--get', 'remote.origin.url' }) end
-local function git_branch() return git_link({ 'branch', '--show-current' }) end
-local function git_root() return git_link({ 'rev-parse', '--show-toplevel' }) end
+local function git_url() return git_stuff({ 'config', '--get', 'remote.origin.url' }) end
+local function git_branch() return git_stuff({ 'branch', '--show-current' }) end
+local function git_root() return git_stuff({ 'rev-parse', '--show-toplevel' }) end
 
 local function parse_url()
 	local url = git_url()
@@ -71,7 +71,7 @@ local function parse_url()
 	return url:match("https://github.com/(.+)$") or url:match("git@github.com:(.+).git$")
 end
 
-function M.get_full_url()
+function M.get_url()
 	local final = parse_url()
 	local git_file = vim.fn.expand('%:p'):match(git_root().."(.+)")
 	local starting, ending = vim.fn.getpos("'<")[2], vim.fn.getpos("'>")[2]

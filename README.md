@@ -1,8 +1,8 @@
 
-# tiny-essentials.nvim
+# essentials.nvim
 
 Some utility functions which i use locally.<br />
-❗ not meant for external use.
+Not actually meant for external use.
 
 The functions included are:
 
