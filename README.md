@@ -21,8 +21,8 @@ The functions included are:
 #### simple_fold()
 * Simple fold function.
 
-#### git_link()
-* Sharable git links with numbers.
+#### get_url()
+* Github link of the file with line numbers gets copied to clipboard (unstable).
 
 #### swap_bool()
 * A function to swap bools. (true->false and false->true)
