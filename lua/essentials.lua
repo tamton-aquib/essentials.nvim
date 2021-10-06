@@ -23,9 +23,9 @@ function M.rename()
     })
     vim.cmd [[startinsert]]
     vim.api.nvim_buf_set_keymap(
-    noice_buf, 'i', '<CR>',
-    '<cmd>lua require"essentials".post("'..rename_old..','..win..'")<CR>',
-    {noremap=true, silent=true}
+        noice_buf, 'i', '<CR>',
+        '<cmd>lua require"essentials".post("'..rename_old..','..win..'")<CR>',
+        {noremap=true, silent=true}
     )
 end
 --------------------------------------------
@@ -47,8 +47,8 @@ function M.toggle_comment(visual)
     local noice = visual and starting..','..ending or ""
 
     vim.cmd(current_line:find("^%s*"..vim.pesc(leader))
-    and noice..'norm ^'..('x'):rep(#leader+1)
-    or noice..'norm I'..leader..' ')
+        and noice..'norm ^'..('x'):rep(#leader+1)
+        or noice..'norm I'..leader..' ')
 
     vim.api.nvim_win_set_cursor(0, cursor_position)
     -- if visual then vim.cmd [[norm gv]] end
