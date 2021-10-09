@@ -2,7 +2,8 @@
 # essentials.nvim
 
 Some tiny utility functions which i use locally.<br />
-Not actually meant for external use.
+Not actually meant for external use because theres no config options.
+Instead you can copy paste these functions to your config.
 
 The functions included are:
 

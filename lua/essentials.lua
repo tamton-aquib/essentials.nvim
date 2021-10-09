@@ -103,7 +103,7 @@ function M.simple_fold()
 
     return start_line .. "  " .. end_line .. spaces
 end
--- set this to activate: set foldtext=luaeval(\"require('noice_utils').simple_fold()\")
+-- set this to activate: set foldtext=luaeval(\"require('essentials').simple_fold()\")
 ---------------------------------
 
 -------- Swap booleans ----------
