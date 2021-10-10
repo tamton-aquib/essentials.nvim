@@ -33,7 +33,7 @@ end
 ---------- comment function ---------
 local comment_map = {
     javascript = '//', typescript = '//', javascriptreact = '//',
-    c = '//', java = '//', rust	= '//',
+    c = '//', java = '//', rust	= '//', cpp = '//',
     python = '#', sh = '#', conf = '#', dosini = '#', yaml = '#',
     lua		= '--',
 }
@@ -87,14 +87,6 @@ end
 --------------------------------
 
 --------- clean folds ----------
--- local function la_place(line)
-    -- vim.fn.sign_define('fold', {text=' ', texthl="LspDiagnosticsSignError"})
-    -- vim.fn.sign_place(line, 'foldgroup', 'fold', vim.fn.expand('%:p'),{lnum=line})
--- end
-
--- local function la_unplace()
-    -- vim.fn.sign_unplace('foldgroup')
--- end
 function M.simple_fold()
     local fs, fe = vim.v.foldstart, vim.v.foldend
     local start_line = vim.fn.getline(fs):gsub("\t", ("\t"):rep(vim.o.tabstop))
@@ -131,11 +123,66 @@ end
 function M.go_to_url()
     local url = vim.fn.expand('<cWORD>')
     if not string.match(url, 'http') then url = "https://github.com/"..url end
+    if string.match(url, [[.+,$]]) then url = url:sub(1,-2) end
 
     vim.notify("Going to "..url, 'info', {title="Opening browser..."})
     vim.cmd(':silent !xdg-open '..url..' 1>/dev/null')
 end
--- 'https://github.com'
+-- 'https://github.com'.
 ---------------------
+
+-------- cht.sh function --------------
+local pickers = require("telescope.pickers")
+local finders = require("telescope.finders")
+local conf = require("telescope.config").values
+local action_state = require("telescope.actions.state")
+local actions = require("telescope.actions")
+
+function M.getword()
+	local nice_word = vim.trim(vim.fn.getline('.'))
+	vim.cmd [[q]]
+
+	local noice = vim.fn.join(vim.split(nice_word, " "), "+")
+	require ("toggleterm.terminal").Terminal:new{
+		cmd=('curl cht.sh/%s/%s'):format(M.lang, noice),
+		float_opts = { border='double' },
+		on_open = function(term)
+			vim.api.nvim_buf_set_keymap(term.bufnr, "n", "q", "<cmd>close<CR>", {noremap = true, silent = true})
+			vim.cmd [[stopinsert!]]
+		  end,
+	}:toggle()
+end
+
+local function tiny_window()
+	local buf = vim.api.nvim_create_buf(false, true)
+
+	local height, width = vim.o.lines, vim.o.columns
+    local w = math.ceil(width * 0.7)
+    local row = math.ceil((height) / 2 - 3)
+    local col = math.ceil((width - w) / 2)
+	vim.api.nvim_open_win(buf, true, {
+		relative='win', row=row, col=col, width=w, height=1, style='minimal', border='rounded'
+	})
+	vim.api.nvim_buf_set_keymap(0, 'i', '<CR>', '<cmd>lua require("essentials").getword()<CR>', {noremap=true})
+	vim.api.nvim_feedkeys('i', 'n', true)
+end
+
+M.cheat_sh = function()
+	pickers.new(require("telescope.themes").get_cursor{}, {
+		prompt_title = "Langs",
+		finder = finders.new_table({'rust', 'python', 'c', 'cpp', 'javascript', 'lua'}),
+		sorter = conf.generic_sorter({}),
+		attach_mappings = function(_, map)
+			map("i", "<cr>", function(prompt_bufnr)
+				M.lang = action_state.get_selected_entry()['value']
+				actions.close(prompt_bufnr)
+				tiny_window()
+			end)
+			return true
+		end,
+	}):find()
+end
+
+---------------------------------------
 
 return M
