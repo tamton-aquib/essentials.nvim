@@ -132,12 +132,6 @@ end
 ---------------------
 
 -------- cht.sh function --------------
-local pickers = require("telescope.pickers")
-local finders = require("telescope.finders")
-local conf = require("telescope.config").values
-local action_state = require("telescope.actions.state")
-local actions = require("telescope.actions")
-
 function M.getword()
 	local nice_word = vim.trim(vim.fn.getline('.'))
 	vim.cmd [[q]]
@@ -168,6 +162,12 @@ local function tiny_window()
 end
 
 M.cheat_sh = function()
+	local pickers = require("telescope.pickers")
+	local finders = require("telescope.finders")
+	local conf = require("telescope.config").values
+	local action_state = require("telescope.actions.state")
+	local actions = require("telescope.actions")
+
 	pickers.new(require("telescope.themes").get_cursor{}, {
 		prompt_title = "Langs",
 		finder = finders.new_table({'rust', 'python', 'c', 'cpp', 'javascript', 'lua'}),
