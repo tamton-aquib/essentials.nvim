@@ -65,7 +65,7 @@ vim.api.nvim_set_keymap('n', '<leader>s', ':lua require("essentials").swap_bool(
 
 #### cheat_sh()
 Search stuff from https://cht.sh. Example: <br />
---> uses telescope to pick language and toggleterm.nvim to display results.
+--> gets filetype(vim.bo.filetype) and uses toggleterm.nvim to display results.
 
 ```lua
 vim.api.nvim_set_keymap('n', '<leader>cs', ':lua require"essentials".cheat_sh()<CR>', {noremap=true, silent=true})

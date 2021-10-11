@@ -138,7 +138,7 @@ function M.getword()
 
 	local noice = vim.fn.join(vim.split(nice_word, " "), "+")
 	require ("toggleterm.terminal").Terminal:new{
-		cmd=('curl cht.sh/%s/%s'):format(M.lang, noice),
+		cmd=('curl cht.sh/%s/%s'):format(vim.bo.ft, noice),
 		float_opts = { border='double' },
 		on_open = function(term)
 			vim.api.nvim_buf_set_keymap(term.bufnr, "n", "q", "<cmd>close<CR>", {noremap = true, silent = true})
@@ -147,7 +147,7 @@ function M.getword()
 	}:toggle()
 end
 
-local function tiny_window()
+function M.cheat_sh()
 	local buf = vim.api.nvim_create_buf(false, true)
 
 	local height, width = vim.o.lines, vim.o.columns
@@ -160,29 +160,6 @@ local function tiny_window()
 	vim.api.nvim_buf_set_keymap(0, 'i', '<CR>', '<cmd>lua require("essentials").getword()<CR>', {noremap=true})
 	vim.api.nvim_feedkeys('i', 'n', true)
 end
-
-M.cheat_sh = function()
-	local pickers = require("telescope.pickers")
-	local finders = require("telescope.finders")
-	local conf = require("telescope.config").values
-	local action_state = require("telescope.actions.state")
-	local actions = require("telescope.actions")
-
-	pickers.new(require("telescope.themes").get_cursor{}, {
-		prompt_title = "Langs",
-		finder = finders.new_table({'rust', 'python', 'c', 'cpp', 'javascript', 'lua'}),
-		sorter = conf.generic_sorter({}),
-		attach_mappings = function(_, map)
-			map("i", "<cr>", function(prompt_bufnr)
-				M.lang = action_state.get_selected_entry()['value']
-				actions.close(prompt_bufnr)
-				tiny_window()
-			end)
-			return true
-		end,
-	}):find()
-end
-
 ---------------------------------------
 
 return M
