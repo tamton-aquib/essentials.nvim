@@ -25,6 +25,12 @@ Go to last edited place when entering a buffer. Example:
 vim.cmd [[au BufEnter * lua require"essentials".last_place()]]
 ```
 ---
+#### run_file()
+Run files according to filetypes and commands specified inside toggleterm.nvim.
+```lua
+vim.api.nvim_set_keymap('n', '<leader>r', ':lua require"essentials".run_file()<CR>', {noremap=true, silent=true})
+```
+---
 
 #### rename()
 VSCodes floating like rename window. Example:

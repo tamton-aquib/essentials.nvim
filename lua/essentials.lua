@@ -1,5 +1,26 @@
 local M = {}
 local line = vim.fn.line
+local exp = vim.fn.expand
+
+-------- Run code according to filetypes ---------
+function M.run_file()
+	local filetypes = {
+		rust	   = "cargo run",
+		python	   = "python "..exp('%:t'),
+		javascript = "npm start",
+		javascriptreact = "npm start",
+		java	   = "javac "..exp('%:t').." && java "..exp('%:t:r').." && rm *.class",
+	}
+
+	local command = filetypes[vim.bo.filetype]
+	if command ~= nil then
+		require("toggleterm.terminal").Terminal:new{
+			cmd=command, close_on_exit = false,
+		}:toggle()
+		print("Running: "..command)
+	end
+end
+--------------------------------------------------
 
 -------- VSCode like rename function -------
 function M.post(rename_old, winnr)
