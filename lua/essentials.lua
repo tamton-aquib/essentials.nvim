@@ -4,12 +4,14 @@ local exp = vim.fn.expand
 
 -------- Run code according to filetypes ---------
 function M.run_file()
+	local filename = exp('%:t')
 	local filetypes = {
 		rust	   = "cargo run",
-		python	   = "python "..exp('%:t'),
+		python	   = "python "..filename,
 		javascript = "npm start",
 		javascriptreact = "npm start",
-		java	   = "javac "..exp('%:t').." && java "..exp('%:t:r').." && rm *.class",
+		java	   = "javac ".. filename.." && java "..exp('%:t:r').." && rm *.class",
+		c	       = "gcc -o noice "..filename.." && ./noice"
 	}
 
 	local command = filetypes[vim.bo.filetype]
