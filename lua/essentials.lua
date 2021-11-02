@@ -144,14 +144,17 @@ end
 
 -----Go To URL-------
 function M.go_to_url()
-    local url = vim.fn.expand('<cWORD>')
-    if not string.match(url, 'http') then url = "https://github.com/"..url end
-    if string.match(url, [[.+,$]]) then url = url:sub(1,-2) end
+	local url = vim.api.nvim_get_current_line():match([[%[.*]%((.*)%)]]) -- To work on md links
+	if url == nil then
+		url = vim.fn.expand('<cWORD>')
+		if not string.match(url, 'http') then url = "https://github.com/"..url end
+		if string.match(url, [[(.+),$]]) then url = url:sub(1,-2) end -- to check commas at the end
+	end
 
     vim.notify("Going to "..url, 'info', {title="Opening browser..."})
     vim.cmd(':silent !xdg-open '..url..' 1>/dev/null')
 end
--- 'https://github.com'.
+-- [md-link-example](https://github.com/tamton-aquib/essentials.nvim)
 ---------------------
 
 -------- cht.sh function --------------
