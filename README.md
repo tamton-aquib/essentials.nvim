@@ -8,8 +8,9 @@ Instead you can copy paste these functions to your config.
 
 
 The functions included are:
+
 #### Go to a url under the cursor
-Will also work for stuff like `folke/tokyonight.nvim` or [link](https://github.com) <br />
+Will also work for stuff like `folke/tokyonight.nvim` or \[link](https://github.com) <br />
 > uses `xdg-open` in linux. <br />
 
 ```vim
@@ -17,7 +18,7 @@ nnoremap gx :lua require("essentials").go_to_url()<CR>
 ```
 ---
 
-### Go to the last place when opening a buffer
+#### Go to the last place when opening a buffer
 ```vim
 vim.cmd [[au BufEnter * lua require("essentials").last_place()]]
 ```
