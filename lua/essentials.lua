@@ -3,7 +3,7 @@ local line = vim.fn.line
 local exp = vim.fn.expand
 
 -------- Run code according to filetypes ---------
-function M.run_file()
+function M.run_file(direction)
 	local filename = exp('%:t')
 	local filetypes = {
 		rust	   = "cargo run",
@@ -14,10 +14,10 @@ function M.run_file()
 		c	       = "gcc -o noice "..filename.." && ./noice"
 	}
 
-	local command = filetypes[vim.bo.filetype]
+	local command = filetypes[vim.bo.ft]
 	if command ~= nil then
 		require("toggleterm.terminal").Terminal:new{
-			cmd=command, close_on_exit = false,
+			cmd=command, close_on_exit=false, direction=direction or "float"
 		}:toggle()
 		print("Running: "..command)
 	end
