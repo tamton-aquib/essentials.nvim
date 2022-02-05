@@ -9,9 +9,8 @@ function M.run_file(direction)
 		rust	   = "cargo run",
 		python	   = "python "..filename,
 		javascript = "npm start",
-		javascriptreact = "npm start",
-		java	   = "javac ".. filename.." && java "..exp('%:t:r').." && rm *.class",
-		c	       = "gcc -o noice "..filename.." && ./noice"
+		c	       = "make",
+		cpp        = "make"
 	}
 
 	local command = filetypes[vim.bo.ft]
