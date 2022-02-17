@@ -1,25 +1,18 @@
 local M = {}
 local line = vim.fn.line
-local exp = vim.fn.expand
 
 -------- Run code according to filetypes ---------
-function M.run_file(direction)
-	local filename = exp('%:t')
-	local filetypes = {
+function M.run_file(height)
+	local fts = {
 		rust	   = "cargo run",
-		python	   = "python "..filename,
+		python	   = "python "..vim.api.nvim_buf_get_name(0),
 		javascript = "npm start",
 		c	       = "make",
-		cpp        = "make"
+		cpp        = "make",
 	}
-
-	local command = filetypes[vim.bo.ft]
-	if command ~= nil then
-		require("toggleterm.terminal").Terminal:new{
-			cmd=command, close_on_exit=false, direction=direction or "float"
-		}:toggle()
-		print("Running: "..command)
-	end
+	local cmd = fts[vim.bo.ft] or "echo 'No command for this filetype specified!'"
+	local ht = type(height) == "number" and height or math.floor(vim.api.nvim_win_get_height(0) / 3)
+	vim.cmd(ht .. "split | terminal " .. cmd)
 end
 --------------------------------------------------
 
