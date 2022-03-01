@@ -17,28 +17,28 @@ end
 --------------------------------------------------
 
 -------- VSCode like rename function -------
-function M.post(rename_old, winnr)
-	local new = vim.api.nvim_get_current_line()
-	vim.api.nvim_win_close(winnr, true)
-	vim.lsp.buf.rename(vim.trim(new))
-	print(rename_old..' -> '..new)
+function M.post(rename_old)
 	vim.cmd [[stopinsert!]]
+	local new = vim.api.nvim_get_current_line()
+	vim.schedule(function()
+		vim.api.nvim_win_close(0, true)
+		vim.lsp.buf.rename(vim.trim(new))
+	end)
+	vim.notify(rename_old..' -> '..new)
 end
 
 function M.rename()
 	local rename_old = vim.fn.expand('<cword>')
 	local noice_buf = vim.api.nvim_create_buf(false, true)
-	local win = vim.api.nvim_open_win(
+	vim.api.nvim_open_win(
 		noice_buf, true, {
-			relative='cursor',
-			row=1, col=1,
-			width=10, height=1,
-			style='minimal', border='single',
+			relative='cursor', style='minimal', border='single',
+			row=1, col=1, width=10, height=1,
 		})
 	vim.cmd [[startinsert]]
 	vim.api.nvim_buf_set_keymap(
 		noice_buf, 'i', '<CR>',
-		'<cmd>lua require"essentials".post("'..rename_old..','..win..'")<CR>',
+		'<cmd>lua require"essentials".post("'..rename_old..'")<CR>',
 		{noremap=true, silent=true}
 	)
 end
