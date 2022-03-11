@@ -12,6 +12,7 @@ The functions included are:
 #### Go to a url under the cursor
 Will also work for stuff like `folke/tokyonight.nvim` or \[link](https://github.com) <br />
 > uses `xdg-open` in linux. <br />
+> use go_to_url("start") for windows.
 
 ```vim
 nnoremap gx :lua require("essentials").go_to_url()<CR>
@@ -27,7 +28,6 @@ vim.cmd [[au BufEnter * lua require("essentials").last_place()]]
 
 #### Run different programming languages
 Run files according to filetypes and commands.
-> Needs akinsho/toggleterm.nvim
 ```vim
 nnoremap <leader>r :lua require("essentials").run_file()<CR>
 ```
@@ -51,8 +51,8 @@ vnoremap <C-_> :lua require("essentials").toggle_comment(true)<CR>
 
 #### Small fold function.
 Simple fold function. Example:
-```vim
-vim.cmd [[set foldtext=luaeval(\"require('essentials').simple_fold()\")]]
+```lua
+vim.opt.foltext = 'v:lua.require("essentials").simple_fold()'
 ```
 
 ---
@@ -73,8 +73,8 @@ nnoremap <leader>s :lua require("essentials").swap_bool()<CR>
 ---
 
 #### Search results from cht.sh
-Gets current filetype and searches accordingly
-> uses toggleterm.nvim to display results.
+Search programming doubts inside neovim with cheat.sh
+> Gets current filetype and searches accordingly.
 
 ```vim
 nnoremap <leader>cs :lua require("essentials").cheat_sh()<CR>

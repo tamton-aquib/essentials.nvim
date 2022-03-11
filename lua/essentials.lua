@@ -1,18 +1,25 @@
 local M = {}
 local line = vim.fn.line
+local map = vim.api.nvim_buf_set_keymap
 
 -------- Run code according to filetypes ---------
 function M.run_file(height)
 	local fts = {
-		rust	   = "cargo run",
-		python	   = "python "..vim.api.nvim_buf_get_name(0),
+		rust       = "cargo run",
+		python     = "python %",
 		javascript = "npm start",
-		c	       = "make",
+		c          = "make",
 		cpp        = "make",
 	}
-	local cmd = fts[vim.bo.ft] or "echo 'No command for this filetype specified!'"
-	local ht = type(height) == "number" and height or math.floor(vim.api.nvim_win_get_height(0) / 3)
-	vim.cmd(ht .. "split | terminal " .. cmd)
+
+	local cmd = fts[vim.bo.ft]
+	if cmd ~= nil then
+		vim.cmd("w")
+		local ht = type(height) == "number" and height or math.floor(vim.api.nvim_win_get_height(0) / 3)
+		vim.cmd(ht .. "split | terminal " .. cmd)
+	else
+		vim.notify("No command Specified for this filetype!")
+	end
 end
 --------------------------------------------------
 
@@ -36,7 +43,7 @@ function M.rename()
 			row=1, col=1, width=10, height=1,
 		})
 	vim.cmd [[startinsert]]
-	vim.api.nvim_buf_set_keymap(
+	map(
 		noice_buf, 'i', '<CR>',
 		'<cmd>lua require"essentials".post("'..rename_old..'")<CR>',
 		{noremap=true, silent=true}
@@ -109,7 +116,7 @@ function M.simple_fold()
 
 	return start_line .. "  " .. end_line .. spaces
 end
--- set this to activate: set foldtext=luaeval(\"require('essentials').simple_fold()\")
+-- set this: vim.opt.foltext = 'v:lua.require("essentials").simple_fold()'
 ---------------------------------
 
 -------- Swap booleans ----------
@@ -126,14 +133,14 @@ function M.last_place()
 	if vim.tbl_contains(vim.api.nvim_list_bufs(), vim.api.nvim_get_current_buf()) then
 		if not vim.tbl_contains({"help", "packer", "toggleterm"}, vim.bo.ft) then
 			if line [['"]] > 1 and line [['"]] <= line("$") then
-				vim.cmd [[norm '"]]
+				vim.cmd [[norm '"]] -- g'" for including column
 			end
 		end
 	end
 end
 -----------------------------------
 
------Go To URL-------
+-------  Go To URL ---------
 function M.go_to_url(cmd)
 	local url = vim.api.nvim_get_current_line():match([[%[.*]%((.*)%)]]) -- To work on md links
 	if url == nil then
@@ -145,36 +152,34 @@ function M.go_to_url(cmd)
 	vim.notify("Going to "..url, 'info', {title="Opening browser..."})
 	vim.cmd(':silent !'..(cmd or "xdg-open")..' '..url..' 1>/dev/null')
 end
----------------------
+----------------------------
 
 -------- cht.sh function --------------
-function M.getword()
-	local nice_word = vim.trim(vim.fn.getline('.'))
-	vim.cmd [[q]]
+function M.get_word()
+	local query = vim.api.nvim_get_current_line()
+	query = vim.fn.join(vim.split(query, " "), "+")
+	vim.cmd [[q | stopinsert]]
 
-	local noice = vim.fn.join(vim.split(nice_word, " "), "+")
-	require ("toggleterm.terminal").Terminal:new{
-		cmd=('curl cht.sh/%s/%s'):format(vim.bo.ft, noice),
-		float_opts = { border='double' },
-		on_open = function(term)
-			vim.api.nvim_buf_set_keymap(term.bufnr, "n", "q", "<cmd>close<CR>", {noremap = true, silent = true})
-			vim.cmd [[stopinsert!]]
-		end,
-	}:toggle()
+	local cmd = ('curl cht.sh/%s/%s'):format(vim.bo.ft, query)
+	vim.cmd("split | term " .. cmd)
+
+	map(0, 'n', 'q', ':bd!<CR>', {noremap=true, silent=true})
+	map(0, 'n', '<Esc>', ':bd!<CR>', {noremap=true, silent=true})
 end
 
 function M.cheat_sh()
 	local buf = vim.api.nvim_create_buf(false, true)
 
 	local height, width = vim.o.lines, vim.o.columns
-	local w = math.ceil(width * 0.7)
-	local row = math.ceil((height) / 2 - 3)
+	local w = math.ceil(width * 0.6)
+	local row = math.ceil((height) / 2 - 5)
 	local col = math.ceil((width - w) / 2)
 	vim.api.nvim_open_win(buf, true, {
-		relative='win', row=row, col=col, width=w, height=1, style='minimal', border='rounded'
+		relative='win', style='minimal', border='rounded',
+		row=row, col=col, width=w, height=1,
 	})
-	vim.api.nvim_buf_set_keymap(0, 'i', '<CR>', '<cmd>lua require("essentials").getword()<CR>', {noremap=true})
-	vim.api.nvim_feedkeys('i', 'n', true)
+	map(0, 'i', '<CR>', '<cmd>lua require("essentials").get_word()<CR>', {noremap=true})
+	vim.cmd [[startinsert]]
 end
 ---------------------------------------
 
