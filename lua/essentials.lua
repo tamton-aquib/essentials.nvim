@@ -2,7 +2,18 @@ local M = {}
 local line = vim.fn.line
 local map = vim.api.nvim_buf_set_keymap
 
--------- Run code according to filetypes ---------
+--> Open a simple terminal.
+---@param cmd string: command to run
+---@param direction string: direction to open
+---@param close string: close_on_exit
+M.open_term = function(cmd, direction, close)
+	local dir_cmds = { h = "split | enew!", v = "vsplit | enew!", t = "enew!" }
+	vim.cmd(dir_cmds[direction or 'h'])
+	vim.fn.termopen(cmd, { on_exit = function(_) if close then vim.cmd('bd') end end })
+end
+
+--> Run the current file according to specific commands
+---@param height number: for size or "v" for vertical
 function M.run_file(height)
 	local fts = {
 		rust       = "cargo run",
@@ -13,52 +24,31 @@ function M.run_file(height)
 	}
 
 	local cmd = fts[vim.bo.ft]
-	if cmd ~= nil then
-		vim.cmd("w")
-		local ht = type(height) == "number" and height or math.floor(vim.api.nvim_win_get_height(0) / 3)
-		vim.cmd(ht .. "split | terminal " .. cmd)
-	else
-		vim.notify("No command Specified for this filetype!")
-	end
+	vim.cmd(
+		cmd and ("w | "..(height or "").."split | terminal "..cmd) or
+		[[echo 'No command Specified for this filetype!']]
+	)
 end
---------------------------------------------------
 
--------- VSCode like rename function -------
-function M.post(rename_old)
-	vim.cmd [[stopinsert!]]
-	local new = vim.api.nvim_get_current_line()
-	vim.schedule(function()
-		vim.api.nvim_win_close(0, true)
-		vim.lsp.buf.rename(vim.trim(new))
-	end)
+--> VScode like rename function
+-- TODO: Add ui.input as a float
+function M.rename()
+	local new
+	local rename_old = vim.fn.expand('<cword>')
+	vim.ui.input({prompt="Enter new: "}, function(input) new=input end)
+	vim.lsp.buf.rename(vim.trim(new))
 	vim.notify(rename_old..' -> '..new)
 end
 
-function M.rename()
-	local rename_old = vim.fn.expand('<cword>')
-	local noice_buf = vim.api.nvim_create_buf(false, true)
-	vim.api.nvim_open_win(
-		noice_buf, true, {
-			relative='cursor', style='minimal', border='single',
-			row=1, col=1, width=10, height=1,
-		})
-	vim.cmd [[startinsert]]
-	map(
-		noice_buf, 'i', '<CR>',
-		'<cmd>lua require"essentials".post("'..rename_old..'")<CR>',
-		{noremap=true, silent=true}
-	)
-end
---------------------------------------------
-
----------- comment function ---------
 local comment_map = {
 	javascript = '//', typescript = '//', javascriptreact = '//',
-	c = '//', java = '//', rust	= '//', cpp = '//',
+	c = '//', java = '//', rust = '//', cpp = '//',
 	python = '#', sh = '#', conf = '#', dosini = '#', yaml = '#',
-	lua		= '--',
+	lua	= '--',
 }
 
+--- A Simple comment toggling function.
+---@param visual boolean
 function M.toggle_comment(visual)
 	local starting, ending = vim.fn.getpos("'<")[2], vim.fn.getpos("'>")[2]
 
@@ -74,7 +64,6 @@ function M.toggle_comment(visual)
 	vim.api.nvim_win_set_cursor(0, cursor_position)
 	-- if visual then vim.cmd [[norm gv]] end
 end
--------------------------------------
 
 ---------- git links -----------
 local function git_stuff(args)
@@ -97,17 +86,18 @@ function M.get_git_url()
 	local git_file = vim.fn.expand('%:p'):match(git_root().."(.+)")
 	local starting, ending = vim.fn.getpos("'<")[2], vim.fn.getpos("'>")[2]
 
-	local noice = ("https://github.com/%s/blob/%s%s#L%s-L%s"):format(
+	local url = ("https://github.com/%s/blob/%s%s#L%s-L%s"):format(
 		final, git_branch(), git_file, starting, ending
 	)
 
-	vim.fn.setreg('+', noice)
-	print("link copied to clipboard!")
+	vim.fn.setreg('+', url)
+	print(url .. " copied to clipboard!")
 	-- os.execute('xdg-open '..noice)
 end
 --------------------------------
 
---------- clean folds ----------
+--- A simple and clean fold function
+---@return string: foldtext
 function M.simple_fold()
 	local fs, fe = vim.v.foldstart, vim.v.foldend
 	local start_line = vim.fn.getline(fs):gsub("\t", ("\t"):rep(vim.o.tabstop))
@@ -117,17 +107,15 @@ function M.simple_fold()
 	return start_line .. "  " .. end_line .. spaces
 end
 -- set this: vim.opt.foltext = 'v:lua.require("essentials").simple_fold()'
----------------------------------
 
--------- Swap booleans ----------
+--> A function to swap bools
 function M.swap_bool()
 	local c = vim.api.nvim_get_current_line()
 	local subs = c:match("true") and c:gsub("true", "false") or c:gsub("false", "true")
 	vim.api.nvim_set_current_line(subs)
 end
----------------------------------
 
------ Go to last edited place -----
+---> Go to last edited place
 function M.last_place()
 	-- if vim.api.nvim_win_is_valid(0) and vim.api.nvim_buf_is_loaded(0) then
 	if vim.tbl_contains(vim.api.nvim_list_bufs(), vim.api.nvim_get_current_buf()) then
@@ -138,9 +126,9 @@ function M.last_place()
 		end
 	end
 end
------------------------------------
 
--------  Go To URL ---------
+--> Go to url under cursor (works on md links too)
+---@param cmd string: the cli command to open browser
 function M.go_to_url(cmd)
 	local url = vim.api.nvim_get_current_line():match([[%[.*]%((.*)%)]]) -- To work on md links
 	if url == nil then
@@ -152,35 +140,19 @@ function M.go_to_url(cmd)
 	vim.notify("Going to "..url, 'info', {title="Opening browser..."})
 	vim.cmd(':silent !'..(cmd or "xdg-open")..' '..url..' 1>/dev/null')
 end
-----------------------------
 
--------- cht.sh function --------------
-function M.get_word()
-	local query = vim.api.nvim_get_current_line()
-	query = vim.fn.join(vim.split(query, " "), "+")
-	vim.cmd [[q | stopinsert]]
+--> cht.sh function
+-- TODO: add ui.input as float
+function M.cheat_sh()
+	local query
+	vim.ui.input({prompt="Enter query: "}, function(inp) query=inp end)
 
-	local cmd = ('curl cht.sh/%s/%s'):format(vim.bo.ft, query)
+	local cmd = ('curl "cht.sh/%s/%s"'):format(vim.bo.ft, query)
 	vim.cmd("split | term " .. cmd)
+	vim.cmd [[stopinsert]]
 
 	map(0, 'n', 'q', ':bd!<CR>', {noremap=true, silent=true})
 	map(0, 'n', '<Esc>', ':bd!<CR>', {noremap=true, silent=true})
 end
-
-function M.cheat_sh()
-	local buf = vim.api.nvim_create_buf(false, true)
-
-	local height, width = vim.o.lines, vim.o.columns
-	local w = math.ceil(width * 0.6)
-	local row = math.ceil((height) / 2 - 5)
-	local col = math.ceil((width - w) / 2)
-	vim.api.nvim_open_win(buf, true, {
-		relative='win', style='minimal', border='rounded',
-		row=row, col=col, width=w, height=1,
-	})
-	map(0, 'i', '<CR>', '<cmd>lua require("essentials").get_word()<CR>', {noremap=true})
-	vim.cmd [[startinsert]]
-end
----------------------------------------
 
 return M
