@@ -1,4 +1,3 @@
-
 # essentials.nvim
 
 Some tiny utility functions which i use locally.<br />
@@ -9,10 +8,10 @@ Instead you can copy paste these functions to your config.
 
 The functions included are:
 
-#### Go to a url under the cursor
+#### Go to url under the cursor
 Will also work for stuff like `folke/tokyonight.nvim` or \[link](https://github.com) <br />
 > uses `xdg-open` in linux. <br />
-> use go_to_url("start") for windows.
+> use go_to_url("start") for windows. #untested
 
 ```vim
 nnoremap gx :lua require("essentials").go_to_url()<CR>
@@ -21,7 +20,7 @@ nnoremap gx :lua require("essentials").go_to_url()<CR>
 
 #### Go to the last place when opening a buffer
 ```vim
-vim.cmd [[au BufEnter * lua require("essentials").last_place()]]
+autocmd BufReadPost * lua require("essentials").last_place()
 ```
 
 ---
@@ -49,10 +48,10 @@ vnoremap <C-_> :lua require("essentials").toggle_comment(true)<CR>
 ```
 ---
 
-#### Small fold function.
+#### A smol fold function.
 Simple fold function. Example:
 ```lua
-vim.opt.foltext = 'v:lua.require("essentials").simple_fold()'
+vim.opt.foldtext = 'v:lua.require("essentials").simple_fold()'
 ```
 
 ---
