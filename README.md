@@ -3,7 +3,7 @@
 Some tiny utility functions which i use locally.<br />
 
 Not actually meant for external use because there are no config options. <br />
-Instead you can copy paste these functions to your config.
+Instead you could fork the repo or copy paste the functions to your config.
 
 
 The functions included are:

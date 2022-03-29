@@ -5,7 +5,7 @@ U.set_quit_maps = function()
 	vim.keymap.set('n', '<Esc>', ':bd!<CR>', {buffer=true, silent=true})
 end
 
--- TODO: implement with blocks
+-- TODO: implement as blocking
 U.ui_input = function(opts, callback)
 	local buf = vim.api.nvim_create_buf(false, true)
 
@@ -17,9 +17,9 @@ U.ui_input = function(opts, callback)
 	vim.cmd [[startinsert]]
 
 	vim.keymap.set('i', '<CR>', function()
-		-- local content = vim.trim(vim.api.nvim_get_current_line())
+		local content = vim.trim(vim.api.nvim_get_current_line())
 		vim.cmd [[q | stopinsert!]]
-		callback(vim.trim(vim.fn.getline('.')))
+		callback(vim.trim(content))
 
 	end, {buffer=true, silent=true})
 end

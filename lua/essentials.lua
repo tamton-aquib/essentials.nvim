@@ -33,10 +33,12 @@ end
 function M.rename()
 	local rename_old = vim.fn.expand('<cword>')
 	U.ui_input({ width=15 }, function(input)
-		vim.schedule(function()
+		if vim.lsp.buf.server_ready() == true then
 			vim.lsp.buf.rename(vim.trim(input))
 			vim.notify(rename_old..' -> '..input)
-		end)
+		else
+			print("LSP Not ready yet!")
+		end
 	end)
 end
 
@@ -52,7 +54,7 @@ local comment_map = {
 function M.toggle_comment(visual)
 	local starting, ending = vim.fn.getpos("'<")[2], vim.fn.getpos("'>")[2]
 
-	local leader = comment_map[vim.bo.ft]
+	local leader = comment_map[vim.bo.ft] or "//"
 	local current_line = vim.api.nvim_get_current_line()
 	local cursor_position = vim.api.nvim_win_get_cursor(0)
 	local noice = visual and starting..','..ending or ""
@@ -91,8 +93,9 @@ end
 ---> Go to last edited place
 function M.last_place()
 	local row, col = unpack(vim.api.nvim_buf_get_mark(0, '"'))
+	print("Row: ", row, "Col: ", col)
 	local last = vim.api.nvim_buf_line_count(0)
-	if (row > 0 or col > 0) and (row <= last) then vim.cmd [[norm '"]] end
+	if (row > 0 or col > 0) and (row <= last) then vim.cmd [[norm! '"]] end
 end
 
 --> Go to url under cursor (works on md links too)
