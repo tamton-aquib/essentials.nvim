@@ -4,7 +4,7 @@
 Some tiny utility functions which i use locally.<br />
 
 Not actually meant for external use because there are no config options. <br />
-Instead you can copy paste these functions to your config.
+Instead you could fork the repo or copy paste these functions to your config.
 
 
 The functions included are:
@@ -21,7 +21,7 @@ nnoremap gx :lua require("essentials").go_to_url()<CR>
 
 #### Go to the last place when opening a buffer
 ```vim
-vim.cmd [[au BufEnter * lua require("essentials").last_place()]]
+vim.cmd [[au BufReadPost * lua require("essentials").last_place()]]
 ```
 
 ---
@@ -52,7 +52,7 @@ vnoremap <C-_> :lua require("essentials").toggle_comment(true)<CR>
 #### Small fold function.
 Simple fold function. Example:
 ```lua
-vim.opt.foltext = 'v:lua.require("essentials").simple_fold()'
+vim.opt.foldtext = 'v:lua.require("essentials").simple_fold()'
 ```
 
 ---
