@@ -1,11 +1,11 @@
-local M = {}
+local E = {}
 local U = require("essentials.utils")
 
 --> Open a simple terminal with few opts.
 ---@param cmd string: command to run
 ---@param direction string: direction to open. ex: "h"/"v"/"t"
 ---@param close boolean: close_on_exit
-M.open_term = function(cmd, direction, close)
+E.open_term = function(cmd, direction, close)
 	local dir_cmds = { h = "split | enew!", v = "vsplit | enew!", t = "enew!" }
 	vim.cmd(dir_cmds[direction or 'h'])
 	vim.fn.termopen(cmd, { on_exit = function(_) if close then vim.cmd('bd') end end })
@@ -13,13 +13,14 @@ end
 
 --> Run the current file according to filetype
 ---@param ht number: for height or "v" for vertical
-function M.run_file(ht)
+function E.run_file(ht)
 	local fts = {
 		rust       = "cargo run",
 		python     = "python %",
 		javascript = "npm start",
 		c          = "make",
 		cpp        = "make",
+		java       = "java %"
 	}
 
 	local cmd = fts[vim.bo.ft]
@@ -30,7 +31,7 @@ function M.run_file(ht)
 end
 
 --> VScode like rename function
-function M.rename()
+function E.rename()
 	local rename_old = vim.fn.expand('<cword>')
 	U.ui_input({ width=15 }, function(input)
 		if vim.lsp.buf.server_ready() == true then
@@ -51,7 +52,7 @@ local comment_map = {
 
 --> A Simple comment toggling function.
 ---@param visual boolean
-function M.toggle_comment(visual)
+function E.toggle_comment(visual)
 	local starting, ending = vim.fn.getpos("'<")[2], vim.fn.getpos("'>")[2]
 
 	local leader = comment_map[vim.bo.ft] or "//"
@@ -73,7 +74,7 @@ end
 
 --- A simple and clean fold function
 ---@return string: foldtext
-function M.simple_fold()
+function E.simple_fold()
 	local fs, fe = vim.v.foldstart, vim.v.foldend
 	local start_line = vim.fn.getline(fs):gsub("\t", ("\t"):rep(vim.opt.ts:get()))
 	local end_line = vim.trim(vim.fn.getline(fe))
@@ -84,23 +85,22 @@ end
 -- set this: vim.opt.foldtext = 'v:lua.require("essentials").simple_fold()'
 
 --> A function to swap bools
-function M.swap_bool()
+function E.swap_bool()
 	local c = vim.api.nvim_get_current_line()
 	local subs = c:match("true") and c:gsub("true", "false") or c:gsub("false", "true")
 	vim.api.nvim_set_current_line(subs)
 end
 
 ---> Go to last edited place
-function M.last_place()
+function E.last_place()
 	local row, col = unpack(vim.api.nvim_buf_get_mark(0, '"'))
-	print("Row: ", row, "Col: ", col)
 	local last = vim.api.nvim_buf_line_count(0)
 	if (row > 0 or col > 0) and (row <= last) then vim.cmd [[norm! '"]] end
 end
 
 --> Go to url under cursor (works on md links too)
 ---@param cmd string: the cli command to open browser. ex: "start","xdg-open"
-function M.go_to_url(cmd)
+function E.go_to_url(cmd)
 	local url = vim.api.nvim_get_current_line():match([[%[.*]%((.*)%)]]) -- To work on md links
 	if not url then
 		url = vim.fn.expand('<cWORD>')
@@ -113,7 +113,7 @@ function M.go_to_url(cmd)
 end
 
 --> cht.sh function
-function M.cheat_sh()
+function E.cheat_sh()
 	U.ui_input({ width=30 }, function(query)
 		query = table.concat(vim.split(query, " "), "+")
 		local cmd = ('curl "https://cht.sh/%s/%s"'):format(vim.bo.ft, query)
@@ -123,4 +123,4 @@ function M.cheat_sh()
 	end)
 end
 
-return M
+return E
