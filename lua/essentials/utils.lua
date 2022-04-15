@@ -17,7 +17,7 @@ U.ui_input = function(opts, callback)
 	vim.cmd [[startinsert]]
 
 	vim.keymap.set('i', '<CR>', function()
-		local content = vim.trim(vim.api.nvim_get_current_line())
+		local content = vim.api.nvim_get_current_line()
 		vim.cmd [[q | stopinsert!]]
 		callback(vim.trim(content))
 
