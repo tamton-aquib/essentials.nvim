@@ -98,7 +98,7 @@ function E.last_place()
     if markpos then
         local row, col = unpack(markpos)
         local last = vim.api.nvim_buf_line_count(0)
-        if (row > 0 or col > 0) and (row <= last) then vim.cmd [[norm! '"]] end
+        if (row > 0 or col > 0) and (row <= last) then vim.cmd("norm! '\"") end
     end
 end
 

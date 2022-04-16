@@ -15,7 +15,7 @@ Will also work for stuff like `folke/tokyonight.nvim` or \[link](https://github.
 > uses `xdg-open` in linux. <br />
 > use go_to_url("start") for windows. #untested
 
-![go_to_url](https://user-images.githubusercontent.com/77913442/163594602-b2f616f5-0d1d-4d24-9c3d-7fef0efefadd.gif)
+![go_to_url_2](https://user-images.githubusercontent.com/77913442/163668818-ed51bb46-3062-48cb-afc1-0a3938d8692a.gif)
 ```vim
 nnoremap gx :lua require("essentials").go_to_url()<CR>
 ```
