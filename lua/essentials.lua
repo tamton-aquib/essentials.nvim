@@ -94,12 +94,13 @@ end
 
 ---> Go to last edited place
 function E.last_place()
-    local markpos = vim.api.nvim_buf_get_mark(0, '"')
-    if markpos then
-        local row, col = unpack(markpos)
-        local last = vim.api.nvim_buf_line_count(0)
-        if (row > 0 or col > 0) and (row <= last) then vim.cmd("norm! '\"") end
-    end
+    -- local markpos = vim.api.nvim_buf_get_mark(0, '"')
+    local _, row, col, _ = unpack(vim.fn.getpos([['"]]))
+    -- if markpos then
+    -- local row, col = unpack(markpos)
+    local last = vim.api.nvim_buf_line_count(0)
+    if (row > 0 or col > 0) and (row <= last) then vim.cmd([[norm! '"]]) end
+    -- end
 end
 
 --> Go to url under cursor (works on md links too)
