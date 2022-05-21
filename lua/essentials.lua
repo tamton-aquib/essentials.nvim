@@ -29,7 +29,7 @@ function E.run_file(ht)
 
     local cmd = fts[vim.bo.ft]
     vim.cmd(
-        cmd and ("w | " .. (ht or "") .. "split | terminal " .. cmd)
+        cmd and ("w | " .. (ht or "") .. "sp | term " .. cmd)
         or "echo 'No command for this filetype'"
     )
 end
@@ -49,9 +49,8 @@ end
 
 local comment_map = {
     javascript = '//', typescript = '//', javascriptreact = '//',
-    c = '//', java = '//', rust = '//', cpp = '//',
+    c = '//', java = '//', rust = '//', cpp = '//', lua = '--',
     python = '#', sh = '#', conf = '#', dosini = '#', yaml = '#',
-    lua	= '--',
 }
 
 --> A Simple comment toggling function.
@@ -72,10 +71,6 @@ function E.toggle_comment(visual)
     vim.api.nvim_win_set_cursor(0, cursor_position)
     -- if visual then vim.cmd [[norm gv]] end
 end
-
----------- git links -----------
--- This was removed, now i use: https://github.com/rktjmp/paperplanes.nvim
---------------------------------
 
 --- A simple and clean fold function
 ---@return string: foldtext
