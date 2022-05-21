@@ -15,7 +15,7 @@ Will also work for stuff like `folke/tokyonight.nvim` or \[link](https://github.
 > uses `xdg-open` in linux. <br />
 > use go_to_url("start") for windows. #untested
 
-![go_to_url](https://user-images.githubusercontent.com/77913442/163594602-b2f616f5-0d1d-4d24-9c3d-7fef0efefadd.gif)
+![go_to_url_2](https://user-images.githubusercontent.com/77913442/163668818-ed51bb46-3062-48cb-afc1-0a3938d8692a.gif)
 ```vim
 nnoremap gx :lua require("essentials").go_to_url()<CR>
 ```
@@ -28,17 +28,17 @@ autocmd BufReadPost * lua require("essentials").last_place()
 
 ---
 
-### Run different programming languages
+### Run different files
 Run files according to filetypes and commands.
 
-![run_file](https://user-images.githubusercontent.com/77913442/163594688-a253cbff-4ee4-4afb-ba4b-45117e09badc.gif)
+![run_file_2](https://user-images.githubusercontent.com/77913442/163661279-666764ca-0ff5-4647-b241-4e3fb2785877.gif)
 ```vim
 nnoremap <leader>r :lua require("essentials").run_file()<CR>
 ```
 
 ---
 
-### VSCode like floating window to rename.
+### VSCode like floating rename window.
 > Uses vim.lsp.buf.rename()
 
 ![rename](https://user-images.githubusercontent.com/77913442/163594637-d4047a95-f748-4d59-95dc-9324f7e14bd7.gif)
