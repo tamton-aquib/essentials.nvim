@@ -1,6 +1,10 @@
 local E = {}
 local U = require("essentials.utils")
 
+E.ui_input = U.ui_input
+E.ui_select = U.ui_select
+E.ui_picker = U.ui_picker
+
 --> Open a simple terminal with few opts.
 ---@param cmd string: command to run
 ---@param direction string: direction to open. ex: "h"/"v"/"t"
@@ -33,7 +37,7 @@ end
 --> VScode like rename function
 function E.rename()
     local rename_old = vim.fn.expand('<cword>')
-    U.ui_input({ width=15 }, function(input)
+    E.ui_input({ width=15 }, function(input)
         if vim.lsp.buf.server_ready() == true then
             vim.lsp.buf.rename(vim.trim(input))
             vim.notify(rename_old..' -> '..input)
@@ -118,7 +122,7 @@ end
 
 --> cht.sh function
 function E.cheat_sh()
-    U.ui_input({ width=30 }, function(query)
+    E.ui_input({ width=30 }, function(query)
         query = table.concat(vim.split(query, " "), "+")
         local cmd = ('curl "https://cht.sh/%s/%s"'):format(vim.bo.ft, query)
         vim.cmd("split | term " .. cmd)
