@@ -5,6 +5,10 @@ U.set_quit_maps = function()
     vim.keymap.set('n', '<ESC>', ':bd!<CR>', { buffer=true, silent=true })
 end
 
+--- A wrapper around telescope.
+---@param tbl table: tbl to be picked
+---@param opts table: options(prompt_title, etc)
+---@param callback function: (to be invoked)
 U.ui_picker = function(tbl, opts, callback)
     local actions = require("telescope.actions")
     local finders = require("telescope.finders")
@@ -28,6 +32,10 @@ U.ui_picker = function(tbl, opts, callback)
     }):find()
 end
 
+--- vim.ui.select emulation in a float.
+---@param choices table: list of choices
+---@param opts table: options(border, width, hl)
+---@param callback function
 U.ui_select = function(choices, opts, callback)
     local o = opts or {}
     local titles = vim.fn.map(choices, function(i, choice)
@@ -70,7 +78,7 @@ U.ui_input = function(opts, callback)
 
     vim.keymap.set('i', '<CR>', function()
         local content = vim.api.nvim_get_current_line()
-        -- if opts.promt then content = content:gsub(opts.prompt, '') end
+        -- if opts.prompt then content = content:gsub(opts.prompt, '') end
         vim.cmd [[q | stopinsert!]]
         callback(vim.trim(content))
     end, {buffer=true, silent=true})

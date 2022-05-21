@@ -38,6 +38,20 @@ nnoremap <leader>r :lua require("essentials").run_file()<CR>
 
 ---
 
+### Open terminal
+Open a terminal with minimal options.<br/>
+Args:
+- cmd: the command to run in the terminal
+- direction: 'h': horizontal, 'v': vertical, 't': tab
+- close_on_exit: boolean
+TODO: add a pic
+
+```vim
+nnoremap <leader>lg :lua require("essentials").open_term('lazygit', 't', true)<CR>
+```
+---
+
+
 ### VSCode like floating rename window.
 > Uses vim.lsp.buf.rename()
 
@@ -84,4 +98,21 @@ Search programming doubts inside neovim with cheat.sh
 ![cheat_sheet](https://user-images.githubusercontent.com/77913442/163594529-eaa5e387-6a22-4570-8b14-805e586d6298.gif)
 ```vim
 nnoremap <leader>cs :lua require("essentials").cheat_sh()<CR>
+```
+
+### Util Functions
+
+- > `ui_input` - emulation for vim.ui.input in a floating window
+```lua
+vim.ui.input = require("essentials").ui_input
+```
+
+- > `ui_select` - emulation for vim.ui.select in a float
+```lua
+vim.ui.select = require("essentials").ui_select
+```
+
+- > `ui_picker` - wrapper util telescope function. Example:
+```lua
+ui_picker({'1', '2', '3'}, {}, function(item) print("Selected: "..item) end)
 ```
