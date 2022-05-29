@@ -61,10 +61,11 @@ U.ui_select = function(choices, opts, callback)
     end, 50)
 end
 
--- TODO: implement as blocking, and no prompts as of now
 --- vim.ui.input emulation in a float
 ---@param opts table: usual opts like in vim.ui.input()
 ---@param callback function: callback to invoke
+-- TODO: implement as blocking, and no prompts as of now
+-- TODO: prompt buf, prompt_setcallback() etc
 U.ui_input = function(opts, callback)
     local buf = vim.api.nvim_create_buf(false, true)
 
@@ -79,7 +80,7 @@ U.ui_input = function(opts, callback)
     vim.keymap.set('i', '<CR>', function()
         local content = vim.api.nvim_get_current_line()
         -- if opts.prompt then content = content:gsub(opts.prompt, '') end
-        vim.cmd [[q | stopinsert!]]
+        vim.cmd [[bd | stopinsert!]]
         callback(vim.trim(content))
     end, {buffer=true, silent=true})
 end

@@ -113,7 +113,7 @@ function E.go_to_url(cmd)
     end
 
     vim.notify("Going to "..url, 'info', { title="Opening browser..." })
-    vim.cmd(':silent !'..(cmd or "xdg-open")..' '..url..' 1>/dev/null')
+    vim.fn.jobstart({cmd or "xdg-open", url}, {on_exit=function() end})
 end
 
 --> cht.sh function
