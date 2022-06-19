@@ -105,11 +105,9 @@ end
 --> Go to url under cursor (works on md links too)
 ---@param cmd string: the cli command to open browser. ex: "start","xdg-open"
 function E.go_to_url(cmd)
-    local url = vim.api.nvim_get_current_line():match([[%[.*]%((.*)%)]]) -- To work on md links
-    if not url then
-        url = vim.fn.expand('<cWORD>')
-        if not url:match('http') then url = "https://github.com/"..url end
-        if url:match([[(.+)[,:]$]]) then url = url:sub(1,-2) end -- to check commas at the end
+    local url = vim.fn.expand('<cfile>', nil, nil)
+    if not url:match("http") then
+        url = "https://github.com/"..url
     end
 
     vim.notify("Going to "..url, 'info', { title="Opening browser..." })
