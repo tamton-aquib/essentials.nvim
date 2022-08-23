@@ -1,18 +1,39 @@
 local E = {}
 local U = require("essentials.utils")
+local term_opened = false
+local term_buf, term_win
 
 E.ui_input = U.ui_input
 E.ui_select = U.ui_select
 E.ui_picker = U.ui_picker
 
---> Open a simple terminal with few opts.
+-- TODO: toggling does not work fully, needs work
+--> Open a simple/single terminal with few opts. (toggleable)
 ---@param cmd string: command to run
 ---@param direction string: direction to open. ex: "h"/"v"/"t"
 ---@param close boolean: close_on_exit
-E.open_term = function(cmd, direction, close)
-    local dir_cmds = { h = "split | enew!", v = "vsplit | enew!", t = "enew!" }
-    vim.cmd(dir_cmds[direction or 'h'])
-    vim.fn.termopen(cmd, { on_exit = function(_) if close then vim.cmd('bd') end end })
+E.toggle_term = function(cmd, direction, close)
+    local dir_cmds = { h = "split", v = "vsplit", t = "tabnew" }
+
+    if not term_opened then
+        vim.cmd(dir_cmds[direction or 'h'])
+
+        if not term_buf then
+            term_buf = vim.api.nvim_create_buf(true, false)
+            vim.api.nvim_set_current_buf(term_buf)
+            vim.fn.termopen(cmd, { on_exit = function(_)
+                if close then vim.cmd('bd') end
+                term_opened = false
+            end })
+        else
+            vim.api.nvim_set_current_buf(term_buf)
+        end
+
+        term_win = vim.api.nvim_get_current_win()
+    else
+        vim.api.nvim_win_hide(term_win)
+    end
+    term_opened = not term_opened
 end
 
 --> Run the current file according to filetype
