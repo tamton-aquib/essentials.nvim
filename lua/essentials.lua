@@ -1,13 +1,11 @@
 local E = {}
 local U = require("essentials.utils")
-local term_opened = false
 local term_buf, term_win
 
 E.ui_input = U.ui_input
 E.ui_select = U.ui_select
 E.ui_picker = U.ui_picker
 
--- TODO: toggling does not work fully, needs work
 --> Open a simple/single terminal with few opts. (toggleable)
 ---@param cmd string: command to run
 ---@param direction string: direction to open. ex: "h"/"v"/"t"
@@ -15,25 +13,36 @@ E.ui_picker = U.ui_picker
 E.toggle_term = function(cmd, direction, close)
     local dir_cmds = { h = "split", v = "vsplit", t = "tabnew" }
 
-    if not term_opened then
+    local set_layout = function()
         vim.cmd(dir_cmds[direction or 'h'])
-
-        if not term_buf then
-            term_buf = vim.api.nvim_create_buf(true, false)
-            vim.api.nvim_set_current_buf(term_buf)
-            vim.fn.termopen(cmd, { on_exit = function(_)
-                if close then vim.cmd('bd') end
-                term_opened = false
-            end })
-        else
-            vim.api.nvim_set_current_buf(term_buf)
-        end
-
         term_win = vim.api.nvim_get_current_win()
-    else
+    end
+    local call_term = function()
+        -- vim.fn.termopen(cmd, { on_exit = function(_) if close then vim.cmd.bd() end end })
+        vim.cmd("term "..(cmd and cmd or vim.opt.shell:get()))
+        term_buf = vim.api.nvim_get_current_buf()
+        if close then vim.cmd("au TermClose * ++once bd") end
+    end
+    if term_buf == nil or term_win == nil then
+        set_layout()
+        call_term()
+        return
+    end
+
+    local buf_exists = function() return vim.api.nvim_buf_is_valid(term_buf) end
+    local win_exists = function() return vim.api.nvim_win_is_valid(term_win) end
+
+    if not buf_exists() and not win_exists() then
+        set_layout()
+        call_term()
+    elseif not buf_exists() and win_exists() then
+        vim.api.nvim_set_current_buf(term_buf)
+    elseif buf_exists() and not win_exists() then
+        set_layout()
+        vim.api.nvim_set_current_buf(term_buf)
+    elseif buf_exists() and win_exists() then
         vim.api.nvim_win_hide(term_win)
     end
-    term_opened = not term_opened
 end
 
 --> Run the current file according to filetype
@@ -75,6 +84,7 @@ local comment_map = {
 }
 
 --> A Simple comment toggling function.
+--> tried commentstring but something was off.
 ---@param visual boolean
 function E.toggle_comment(visual)
     local startrow, endrow = vim.fn.getpos("'<")[2], vim.fn.getpos("'>")[2]
