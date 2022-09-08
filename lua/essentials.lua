@@ -11,7 +11,7 @@ E.ui_picker = U.ui_picker
 ---@param direction string: direction to open. ex: "h"/"v"/"t"
 ---@param close boolean: close_on_exit
 E.toggle_term = function(cmd, direction, close)
-    local dir_cmds = { h = "split", v = "vsplit", t = "tabnew" }
+    local dir_cmds = { h = "split", v = "vsplit", t = "" }
 
     local set_layout = function()
         vim.cmd(dir_cmds[direction or 'h'])
@@ -21,7 +21,10 @@ E.toggle_term = function(cmd, direction, close)
         -- vim.fn.termopen(cmd, { on_exit = function(_) if close then vim.cmd.bd() end end })
         vim.cmd("term "..(cmd and cmd or vim.opt.shell:get()))
         term_buf = vim.api.nvim_get_current_buf()
-        if close then vim.cmd("au TermClose * ++once bd") end
+        if close then
+            vim.cmd("au TermClose * ++once bd")
+            if direction == 't' then term_buf, term_win = nil, nil end
+        end
     end
     if term_buf == nil or term_win == nil then
         set_layout()
