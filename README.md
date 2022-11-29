@@ -38,6 +38,8 @@ Share file or part of a file over https://0x0.st
 ![null_pointer](https://user-images.githubusercontent.com/77913442/204575272-ae836706-ec7e-495c-b37a-740e60f6e552.gif)
 ```vim
 nnoremap <leader>pp :lua require("essentials").null_pointer()<CR>
+" or as a command
+command! -range=% PP lua require("essentials").null_pointer()
 ```
 
 

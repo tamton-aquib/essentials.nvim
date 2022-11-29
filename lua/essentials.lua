@@ -8,7 +8,7 @@ E.ui_picker = U.ui_picker
 
 ---> Share the file or a range of lines over https://0x0.st .
 E.null_pointer = function()
-    local from, to = vim.fn.getpos("'<")[2], vim.fn.getpos("'>")[2]
+    local from, to = vim.api.nvim_buf_get_mark(0, "<")[1], vim.api.nvim_buf_get_mark(0, ">")[1]
     local file = vim.fn.tempname()
     vim.cmd(":silent! ".. (from == to and "" or from..","..to).."w "..file)
 
