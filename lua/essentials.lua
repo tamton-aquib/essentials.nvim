@@ -6,6 +6,22 @@ E.ui_input = U.ui_input
 E.ui_select = U.ui_select
 E.ui_picker = U.ui_picker
 
+---> Share the file or a range of lines over https://0x0.st .
+E.null_pointer = function()
+    local from, to = vim.fn.getpos("'<")[2], vim.fn.getpos("'>")[2]
+    local file = vim.fn.tempname()
+    vim.cmd(":silent! ".. (from == to and "" or from..","..to).."w "..file)
+
+    vim.fn.jobstart({"curl", "-sF", "file=@"..file.."", "https://0x0.st"}, {
+        stdout_buffered=true,
+        on_stdout=function(_, data)
+            vim.fn.setreg("+", data[1])
+            vim.notify("Copied "..data[1].." to clipboard!")
+        end,
+        on_stderr=function(_, data) if data then print(table.concat(data)) end end
+    })
+end
+
 --> Open a simple/single terminal with few opts. (toggleable)
 ---@param cmd string: command to run
 ---@param direction string: direction to open. ex: "h"/"v"/"t"
@@ -50,7 +66,7 @@ end
 
 --> Run the current file according to filetype
 ---@param ht number: for height or "v" for vertical
-function E.run_file(ht)
+E.run_file = function(ht)
     local fts = {
         rust       = "cargo run",
         python     = "python %",
@@ -68,14 +84,14 @@ function E.run_file(ht)
 end
 
 --> VScode like rename function
-function E.rename()
+E.rename = function()
     local rename_old = vim.fn.expand('<cword>')
     E.ui_input({ width=15 }, function(input)
         if vim.lsp.buf.server_ready() == true then
             vim.lsp.buf.rename(vim.trim(input))
             vim.notify(rename_old..' -> '..input)
         else
-            print("LSP Not ready yet!")
+            vim.notify("LSP Not ready yet!")
         end
     end)
 end
@@ -89,7 +105,7 @@ local comment_map = {
 --> A Simple comment toggling function.
 --> tried commentstring but something was off.
 ---@param visual boolean
-function E.toggle_comment(visual)
+E.toggle_comment = function(visual)
     local startrow, endrow = vim.fn.getpos("'<")[2], vim.fn.getpos("'>")[2]
     -- local startrow, endrow = vim.fn.getpos("v")[2], vim.fn.getpos(".")[2]
 
@@ -108,7 +124,7 @@ end
 
 --- A simple and clean fold function
 ---@return string: foldtext
-function E.simple_fold()
+E.simple_fold = function()
     local fs, fe = vim.v.foldstart, vim.v.foldend
     local start_line = vim.fn.getline(fs):gsub("\t", ("\t"):rep(vim.opt.ts:get()))
     local end_line = vim.trim(vim.fn.getline(fe))
@@ -119,14 +135,14 @@ end
 -- set this: vim.opt.foldtext = 'v:lua.require("essentials").simple_fold()'
 
 --> A function to swap bools
-function E.swap_bool()
+E.swap_bool = function()
     local c = vim.api.nvim_get_current_line()
     local subs = c:match("true") and c:gsub("true", "false") or c:gsub("false", "true")
     vim.api.nvim_set_current_line(subs)
 end
 
 ---> Go to last edited place
-function E.last_place()
+E.last_place = function()
     -- local markpos = vim.api.nvim_buf_get_mark(0, '"')
     local _, row, col, _ = unpack(vim.fn.getpos([['"]]))
     -- if markpos then
@@ -138,7 +154,7 @@ end
 
 --> Go to url under cursor (works on md links too)
 ---@param cmd string: the cli command to open browser. ex: "start","xdg-open"
-function E.go_to_url(cmd)
+E.go_to_url = function(cmd)
     local url = vim.fn.expand('<cfile>', nil, nil)
     if not url:match("http") then
         url = "https://github.com/"..url
@@ -149,7 +165,7 @@ function E.go_to_url(cmd)
 end
 
 --> cht.sh function
-function E.cheat_sh()
+E.cheat_sh = function()
     E.ui_input({ width=30 }, function(query)
         query = table.concat(vim.split(query, " "), "+")
         local cmd = ('curl "https://cht.sh/%s/%s"'):format(vim.bo.ft, query)
