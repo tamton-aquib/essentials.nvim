@@ -21,6 +21,28 @@ nnoremap gx :lua require("essentials").go_to_url()<CR>
 ```
 ---
 
+### Search results from cht.sh
+Search programming doubts inside neovim with cheat.sh
+> Gets current filetype and searches accordingly.
+
+![cheat_sheet](https://user-images.githubusercontent.com/77913442/163594529-eaa5e387-6a22-4570-8b14-805e586d6298.gif)
+```vim
+nnoremap <leader>cs :lua require("essentials").cheat_sh()<CR>
+```
+
+---
+
+### null_pointer
+Share file or part of a file over https://0x0.st
+
+![null_pointer](https://user-images.githubusercontent.com/77913442/204575272-ae836706-ec7e-495c-b37a-740e60f6e552.gif)
+```vim
+nnoremap <leader>pp :lua require("essentials").null_pointer()<CR>
+```
+
+
+---
+
 ### Go to the last place when opening a buffer
 ```vim
 autocmd BufReadPost * lua require("essentials").last_place()
@@ -38,6 +60,16 @@ nnoremap <leader>r :lua require("essentials").run_file()<CR>
 
 ---
 
+
+### VSCode like floating rename window.
+> Uses vim.lsp.buf.rename()
+
+![rename](https://user-images.githubusercontent.com/77913442/163594637-d4047a95-f748-4d59-95dc-9324f7e14bd7.gif)
+```vim
+nnoremap <F2> :lua require("essentials").rename()<CR>
+```
+---
+
 ### Open terminal
 Open a terminal with minimal options.<br/>
 Args:
@@ -48,16 +80,6 @@ TODO: add a pic
 
 ```vim
 nnoremap <leader>lg :lua require("essentials").open_term('lazygit', 't', true)<CR>
-```
----
-
-
-### VSCode like floating rename window.
-> Uses vim.lsp.buf.rename()
-
-![rename](https://user-images.githubusercontent.com/77913442/163594637-d4047a95-f748-4d59-95dc-9324f7e14bd7.gif)
-```vim
-nnoremap <F2> :lua require("essentials").rename()<CR>
 ```
 ---
 
@@ -88,16 +110,6 @@ A function to swap bools.
 ![swap_bool](https://user-images.githubusercontent.com/77913442/163594860-425702b5-8c8f-42ac-a899-b41ea31d83da.gif)
 ```vim
 nnoremap <leader>s :lua require("essentials").swap_bool()<CR>
-```
----
-
-### Search results from cht.sh
-Search programming doubts inside neovim with cheat.sh
-> Gets current filetype and searches accordingly.
-
-![cheat_sheet](https://user-images.githubusercontent.com/77913442/163594529-eaa5e387-6a22-4570-8b14-805e586d6298.gif)
-```vim
-nnoremap <leader>cs :lua require("essentials").cheat_sh()<CR>
 ```
 
 ### Util Functions
