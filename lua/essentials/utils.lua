@@ -1,8 +1,46 @@
 local U = {}
+local log_levels = { [3]="Warn", [4]="Error", [2]="Info" }
+local current_line = 1
 
 U.set_quit_maps = function()
     vim.keymap.set('n', 'q', ':bd!<CR>', { buffer=true, silent=true })
     vim.keymap.set('n', '<ESC>', ':bd!<CR>', { buffer=true, silent=true })
+end
+
+--- Minimal floating notify window.
+---@param msg string
+---@param level number or vim.lsp.log_levels
+---@param lopts table
+U.ui_notify = function(msg, level, lopts)
+    local content = vim.split(msg, '\n')
+    lopts = lopts or {}
+    local hl = log_levels[level] or "Hint"
+
+    if #content >= 10 then
+        vim.api.nvim_echo(content, true, {})
+        return
+    end
+
+    local buf = vim.api.nvim_create_buf(false, true)
+    vim.bo[buf].ft = "notify"
+
+    local maxlen = math.max(unpack(vim.fn.map(content, 'strwidth(v:val)'))) + 1
+    maxlen = math.min(math.max(maxlen, 20), vim.o.columns-2)
+
+    local win = vim.api.nvim_open_win(buf, false, {
+        relative='editor', style='minimal', border='rounded', noautocmd=true,
+        row=current_line, col=vim.o.columns-maxlen, width=maxlen, height=#content
+    })
+    vim.api.nvim_win_set_option(win, 'winhighlight', 'Normal:DiagnosticSign'..hl)
+    vim.api.nvim_win_set_option(win, 'winhighlight', 'FloatBorder:DiagnosticSign'..hl)
+    vim.api.nvim_buf_set_lines(buf, 0, #content-1, false, content)
+    current_line = current_line + #content + 1
+
+    vim.defer_fn(function()
+        if vim.api.nvim_win_is_valid(win) then vim.api.nvim_win_close(win, true) end
+        if vim.api.nvim_buf_is_valid(win) then vim.api.nvim_buf_delete(buf, {force=true}) end
+        current_line = current_line - #content - 1
+    end, lopts.timeout or 5000)
 end
 
 --- A wrapper around telescope.

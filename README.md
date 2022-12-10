@@ -130,3 +130,8 @@ vim.ui.select = require("essentials").ui_select
 ```lua
 ui_picker({'1', '2', '3'}, {}, function(item) print("Selected: "..item) end)
 ```
+
+- > `ui_notify` - A floating window for vim.notify
+```lua
+vim.notify = require("essentials").ui_notify
+```

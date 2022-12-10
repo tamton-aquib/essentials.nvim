@@ -5,6 +5,7 @@ local term_buf, term_win
 E.ui_input = U.ui_input
 E.ui_select = U.ui_select
 E.ui_picker = U.ui_picker
+E.ui_notify = U.ui_notify
 
 ---> Share the file or a range of lines over https://0x0.st .
 E.null_pointer = function()
