@@ -5,6 +5,7 @@ local current_line = 1
 U.set_quit_maps = function()
     vim.keymap.set('n', 'q', ':bd!<CR>', { buffer=true, silent=true })
     vim.keymap.set('n', '<ESC>', ':bd!<CR>', { buffer=true, silent=true })
+    vim.keymap.set('n', '<C-c>', ':bd!<CR>', { buffer=true, silent=true })
 end
 
 --- Minimal floating notify window.
@@ -79,24 +80,30 @@ U.ui_select = function(choices, opts, callback)
     local titles = vim.fn.map(choices, function(i, choice)
         return i+1 .. ": " .. (type(choice) == 'table' and choice[2].title or choice)
     end)
-    ---@diagnostic disable-next-line: unused-local
+
     local max = vim.fn.max(vim.fn.map(titles, 'strwidth(v:val)'))
-    max = (max > 50 and 50 or max) < 20 and 20 or max
+    max = math.min(math.max(max, 20), 50)
+
     local buf = vim.api.nvim_create_buf(false, true)
     vim.api.nvim_open_win(buf, true, {
         style='minimal', border=o.border or 'double', relative='cursor',
         row=1, col=1, width=o.width or max, height=#choices
     })
-    vim.api.nvim_put(titles, "", false, false)
+    vim.api.nvim_buf_set_lines(buf, 0, -1, false, titles)
+    U.set_quit_maps()
 
-    local m_id = vim.fn.matchadd(o.hl or "keyword", "\\zs\\d:\\ze")
-    vim.defer_fn(function()
-        local selection = string.char(vim.fn.getchar())
-        callback(choices[tonumber(selection)])
-        -- TODO: no need to clear ig cos matchadd is local to win
-        vim.fn.matchdelete(m_id)
-        vim.api.nvim_buf_delete(buf, {force=true})
-    end, 50)
+    for i=1,#choices do
+        vim.api.nvim_buf_add_highlight(buf, 0, 'Keyword', i-1, 0, 3)
+        vim.keymap.set('n', tostring(i), function()
+            pcall(vim.api.nvim_buf_delete, buf, {force=true})
+            callback(choices[i])
+        end)
+    end
+    vim.keymap.set('n', '<CR>', function()
+        local c = vim.api.nvim_get_current_line():sub(1,1)
+        pcall(vim.api.nvim_buf_delete, buf, {force=true})
+        callback(choices[tonumber(c)])
+    end)
 end
 
 --- vim.ui.input emulation in a float
@@ -109,7 +116,7 @@ U.ui_input = function(opts, callback)
 
     vim.api.nvim_open_win(buf, true, {
         relative='cursor', style='minimal', border='single',
-        row=1, col=1, width=opts.width or 15, height=1
+        row=1, col=1, width=opts.width or 20, height=1
     })
     U.set_quit_maps()
     if opts.default then vim.api.nvim_put({opts.default}, "", true, true) end
