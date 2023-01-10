@@ -18,7 +18,7 @@ U.ui_notify = function(msg, level, lopts)
     local hl = log_levels[level] or "Hint"
 
     if #content >= 10 then
-        vim.api.nvim_echo(content, true, {})
+        vim.api.nvim_echo(vim.tbl_map(function(i) return {i.."\n", log_levels[level]} end, content), true, {})
         return
     end
 
