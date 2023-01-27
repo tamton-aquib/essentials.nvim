@@ -1,6 +1,5 @@
 local E = {}
 local U = require("essentials.utils")
-local term_buf, term_win
 
 E.ui_input = U.ui_input
 E.ui_select = U.ui_select
@@ -24,45 +23,26 @@ E.null_pointer = function()
 end
 
 --> Open a simple/single terminal with few opts. (toggleable)
+--> Thanks to: https://gist.github.com/shivamashtikar/16a4d7b83b743c9619e29b47a66138e0
 ---@param cmd string: command to run
 ---@param direction string: direction to open. ex: "h"/"v"/"t"
 ---@param close boolean: close_on_exit
 E.toggle_term = function(cmd, direction, close)
-    local dir_cmds = { h = "split", v = "vsplit", t = "" }
+    local t_buf, t_win = vim.fn.bufnr("term://"), vim.fn.bufwinnr("term://")
+    local dir = ({t='enew', v='vsp', h='sp'})[direction] or 'h'
+    local w_count = #vim.api.nvim_list_wins()
 
-    local set_layout = function()
-        vim.cmd(dir_cmds[direction or 'h'])
-        term_win = vim.api.nvim_get_current_win()
-    end
-    local call_term = function()
-        -- vim.fn.termopen(cmd, { on_exit = function(_) if close then vim.cmd.bd() end end })
-        vim.cmd("term "..(cmd and cmd or vim.opt.shell:get()))
-        term_buf = vim.api.nvim_get_current_buf()
-        if close then
-            vim.cmd("au TermClose * ++once bd")
-            if direction == 't' then term_buf, term_win = nil, nil end
-        end
-    end
-    if term_buf == nil or term_win == nil then
-        set_layout()
-        call_term()
-        return
+    if t_win > 0 and w_count > 1 then
+        vim.cmd(t_win .. "wincmd c")
+    elseif t_buf > 0 and t_buf ~= vim.api.nvim_get_current_buf() then
+        vim.cmd(dir.." | b "..t_buf)
+    elseif t_buf == vim.api.nvim_get_current_buf() then
+        vim.cmd("bp | " .. dir.." | b"..t_buf.." | wincmd p")
+    else
+        vim.cmd(dir.."| term "..(cmd or ''))
     end
 
-    local buf_exists = function() return vim.api.nvim_buf_is_valid(term_buf) end
-    local win_exists = function() return vim.api.nvim_win_is_valid(term_win) end
-
-    if not buf_exists() and not win_exists() then
-        set_layout()
-        call_term()
-    elseif not buf_exists() and win_exists() then
-        vim.api.nvim_set_current_buf(term_buf)
-    elseif buf_exists() and not win_exists() then
-        set_layout()
-        vim.api.nvim_set_current_buf(term_buf)
-    elseif buf_exists() and win_exists() then
-        vim.api.nvim_win_hide(term_win)
-    end
+    if close then vim.cmd("au TermClose * ++once bd") end
 end
 
 --> Run the current file according to filetype

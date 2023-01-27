@@ -87,23 +87,21 @@ U.ui_select = function(choices, opts, callback)
     local buf = vim.api.nvim_create_buf(false, true)
     vim.api.nvim_open_win(buf, true, {
         style='minimal', border=o.border or 'double', relative='cursor',
-        row=1, col=1, width=o.width or max, height=#choices
+        row=1, col=1, width=o.width or max, height=#choices, title=opts.prompt
     })
     vim.api.nvim_buf_set_lines(buf, 0, -1, false, titles)
     U.set_quit_maps()
 
-    for i=1,#choices do
-        vim.api.nvim_buf_add_highlight(buf, 0, 'Keyword', i-1, 0, 3)
-        vim.keymap.set('n', tostring(i), function()
-            pcall(vim.api.nvim_buf_delete, buf, {force=true})
-            callback(choices[i])
-        end)
-    end
-    vim.keymap.set('n', '<CR>', function()
-        local c = vim.api.nvim_get_current_line():sub(1,1)
+    local post_select = function(i)
         pcall(vim.api.nvim_buf_delete, buf, {force=true})
-        callback(choices[tonumber(c)])
-    end)
+        callback(choices[i])
+    end
+
+    for i=1,#choices do
+        vim.api.nvim_buf_add_highlight(buf, 0, 'Identifier', i-1, 0, 3)
+        vim.keymap.set('n', tostring(i), function() post_select(i) end)
+    end
+    vim.keymap.set('n', '<CR>', function() post_select(vim.api.nvim_win_get_cursor(0)[1]) end)
 end
 
 --- vim.ui.input emulation in a float
@@ -116,7 +114,7 @@ U.ui_input = function(opts, callback)
 
     vim.api.nvim_open_win(buf, true, {
         relative='cursor', style='minimal', border='single',
-        row=1, col=1, width=opts.width or 20, height=1
+        row=1, col=1, width=opts.width or 20, height=1, title=opts.prompt
     })
     U.set_quit_maps()
     if opts.default then vim.api.nvim_put({opts.default}, "", true, true) end
