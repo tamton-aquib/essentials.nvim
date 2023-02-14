@@ -13,12 +13,12 @@ E.null_pointer = function()
     vim.cmd(":silent! ".. (from == to and "" or from..","..to).."w "..file)
 
     vim.fn.jobstart({"curl", "-sF", "file=@"..file.."", "https://0x0.st"}, {
-        stdout_buffered=true,
-        on_stdout=function(_, data)
+        stdout_buffereda = true,
+        on_stdout = function(_, data)
             vim.fn.setreg("+", data[1])
             vim.notify("Copied "..data[1].." to clipboard!")
         end,
-        on_stderr=function(_, data) if data then print(table.concat(data)) end end
+        on_stderr = function(_, data) if data then print(table.concat(data)) end end
     })
 end
 
@@ -40,9 +40,9 @@ E.toggle_term = function(cmd, direction, close)
         vim.cmd("bp | " .. dir.." | b"..t_buf.." | wincmd p")
     else
         vim.cmd(dir.."| term "..(cmd or ''))
+        vim.bo.buflisted = false
+        if close then vim.cmd("au TermClose * ++once bd") end
     end
-
-    if close then vim.cmd("au TermClose * ++once bd") end
 end
 
 --> Run the current file according to filetype
