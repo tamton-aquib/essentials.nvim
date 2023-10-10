@@ -6,6 +6,28 @@ E.ui_select = U.ui_select
 E.ui_picker = U.ui_picker
 E.ui_notify = U.ui_notify
 
+E.messages = function()
+    local contents = vim.api.nvim_exec2("mess", {output=true})
+    if contents.output == "" then return end
+    vim.cmd("vnew | setl bt=nofile ft=yaml bh=wipe nonu nornu")
+
+    vim.api.nvim_put(vim.split(contents.output, '\n'), "", true, true)
+    U.set_quit_maps()
+end
+
+--> Open current project note neorg file.
+E.open_quick_note = function()
+    local datapath = vim.fn.stdpath("data").."/quicknote/"
+    if not vim.uv.fs_stat(datapath) then
+        vim.notify("Datapath doesnt exist. Creating....")
+        vim.fn.mkdir(datapath)
+    end
+
+    local project_name = vim.fn.fnamemodify(vim.uv.cwd(), ":t"):gsub("[\\.\\-]", "")
+    vim.cmd.edit(datapath..project_name..'.norg')
+end
+
+
 ---> Share the file or a range of lines over https://0x0.st .
 E.null_pointer = function()
     local from, to = vim.api.nvim_buf_get_mark(0, "<")[1], vim.api.nvim_buf_get_mark(0, ">")[1]
