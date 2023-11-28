@@ -35,7 +35,7 @@ E.null_pointer = function()
     vim.cmd(":silent! ".. (from == to and "" or from..","..to).."w "..file)
 
     vim.fn.jobstart({"curl", "-sF", "file=@"..file.."", "https://0x0.st"}, {
-        stdout_buffereda = true,
+        stdout_buffered = true,
         on_stdout = function(_, data)
             vim.fn.setreg("+", data[1])
             vim.notify("Copied "..data[1].." to clipboard!")
@@ -90,12 +90,9 @@ end
 E.rename = function()
     local rename_old = vim.fn.expand('<cword>')
     E.ui_input({ width=15 }, function(input)
-        if vim.lsp.buf.server_ready() == true then
-            vim.lsp.buf.rename(vim.trim(input))
-            vim.notify(rename_old..' -> '..input)
-        else
-            vim.notify("LSP Not ready yet!")
-        end
+        vim.lsp.buf.rename(vim.trim(input))
+        vim.notify(rename_old..' -> '..input)
+        vim.notify("LSP Not ready yet!")
     end)
 end
 
