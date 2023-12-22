@@ -6,6 +6,21 @@ E.ui_select = U.ui_select
 E.ui_picker = U.ui_picker
 E.ui_notify = U.ui_notify
 
+--> printf like function for quick debugging
+Util.konsole = function()
+    local word = vim.fn.expand("<cword>")
+    local ans = ({
+        typescript = 'console.log("'..word..': ", '..word..')',
+        lua = 'vim.print("'..word..': ", '..word..')',
+        rust = 'println!("'..word..': {:?}", '..word..')',
+        python = 'print("'..word..': ", '..word..')'
+    })[vim.bo.ft]
+    vim.cmd("norm o")
+    vim.snippet.expand((" "):rep(vim.api.nvim_get_current_line():match("^%s*"):len())..ans)
+    -- setlines(0, vim.fn.line('.'), vim.fn.line('.'), false, {vim.fn.getline('.'):match("^%s*")..ans})
+end
+
+
 E.messages = function()
     local contents = vim.api.nvim_exec2("mess", {output=true})
     if contents.output == "" then return end
