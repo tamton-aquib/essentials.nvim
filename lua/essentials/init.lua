@@ -6,6 +6,11 @@ E.ui_select = U.ui_select
 E.ui_picker = U.ui_picker
 E.ui_notify = U.ui_notify
 
+--> Toggling quickfix window with a keybind
+Util.toggle_quickfix = function()
+    vim.cmd(#vim.iter(vim.api.nvim_list_wins()):filter(function(w) return vim.fn.win_gettype(w) == "quickfix" end):totable() > 0 and "ccl" or "cope")
+end
+
 --> printf like function for quick debugging
 Util.konsole = function()
     local word = vim.fn.expand("<cword>")
