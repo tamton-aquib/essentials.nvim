@@ -77,17 +77,18 @@ end
 ---@param callback function
 U.ui_select = function(choices, opts, callback)
     local o = opts or {}
-    local titles = vim.fn.map(choices, function(i, choice)
-        return i+1 .. ": " .. (type(choice) == 'table' and choice[2].title or choice)
-    end)
+    local titles = vim.iter(ipairs(choices)):map(function(i, choice) return i..": "..(choice.action.title) end):totable()
+    -- return i+1 .. ": " .. (type(choice) == 'table' and choice[2].title or choice)
 
-    local max = vim.fn.max(vim.fn.map(titles, 'strwidth(v:val)'))
-    max = math.min(math.max(max, 20), 50)
+    local max = vim.iter(titles):fold(0, function(t, s)
+        return s:len() > t and s:len() or t
+    end)
+    max = math.min(math.max(max, 20), 80)
 
     local buf = vim.api.nvim_create_buf(false, true)
     vim.api.nvim_open_win(buf, true, {
         style='minimal', border=o.border or 'double', relative='cursor',
-        row=1, col=1, width=o.width or max, height=#choices, title=opts.prompt
+        row=1, col=1, width=o.width or max+1, height=#choices, title=opts.prompt
     })
     vim.api.nvim_buf_set_lines(buf, 0, -1, false, titles)
     U.set_quit_maps()
