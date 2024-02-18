@@ -14,14 +14,15 @@ end
 --> printf like function for quick debugging
 E.konsole = function()
     local word = vim.fn.expand("<cword>")
+    local spaces = vim.api.nvim_get_current_line():match("^(%s*)"):len()
     local ans = ({
-        typescript = 'console.log("'..word..': ", '..word..')',
-        lua = 'vim.print("'..word..': ", '..word..')',
-        rust = 'println!("'..word..': {:?}", '..word..')',
-        python = 'print("'..word..': ", '..word..')'
+        typescript = 'console.log("${1:'..word..'}: ", '..word..')',
+        lua = 'vim.print("${1:'..word..'}: ", '..word..')',
+        rust = 'println!("${1:'..word..'}: ", '..word..')',
+        python = 'print("${1:'..word..'}: ", '..word..')'
     })[vim.bo.ft]
-    vim.cmd("norm o")
-    vim.snippet.expand((" "):rep(vim.api.nvim_get_current_line():match("^%s*"):len())..ans)
+    vim.cmd.norm("o")
+    vim.snippet.expand((" "):rep(spaces)..ans)
     -- setlines(0, vim.fn.line('.'), vim.fn.line('.'), false, {vim.fn.getline('.'):match("^%s*")..ans})
 end
 
