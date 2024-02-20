@@ -77,13 +77,14 @@ end
 ---@param callback function
 U.ui_select = function(choices, opts, callback)
     local o = opts or {}
-    local titles = vim.iter(ipairs(choices)):map(function(i, choice) return i..": "..(choice.action.title) end):totable()
-    -- return i+1 .. ": " .. (type(choice) == 'table' and choice[2].title or choice)
+    local titles = vim.iter(ipairs(choices)):map(function(i, choice)
+        return i..": "..(opts.format_item or tostring)(choice)
+    end):totable()
 
     local max = vim.iter(titles):fold(0, function(t, s)
         return s:len() > t and s:len() or t
     end)
-    max = math.min(math.max(max, 20), 80)
+    max = math.min(math.max(max, opts.prompt and opts.prompt:len() or 20), 80)
 
     local buf = vim.api.nvim_create_buf(false, true)
     vim.api.nvim_open_win(buf, true, {
