@@ -1,6 +1,7 @@
 local U = {}
 local log_levels = { [3]="Warn", [4]="Error", [2]="Info" }
 local current_line = 1
+local ns = vim.api.nvim_create_namespace("essentials")
 
 U.set_quit_maps = function()
     vim.keymap.set('n', 'q', ':bd!<CR>', { buffer=true, silent=true })
@@ -32,8 +33,9 @@ U.ui_notify = function(msg, level, lopts)
         relative='editor', style='minimal', border='rounded', noautocmd=true,
         row=current_line, col=vim.o.columns-maxlen, width=maxlen, height=#content
     })
-    vim.api.nvim_win_set_option(win, 'winhighlight', 'Normal:DiagnosticSign'..hl)
-    vim.api.nvim_win_set_option(win, 'winhighlight', 'FloatBorder:DiagnosticSign'..hl)
+    vim.api.nvim_set_hl(ns, 'NormalFloat', {link="DiagnosticSign"..hl})
+    vim.api.nvim_set_hl(ns, 'FloatBorder', {link="DiagnosticSign"..hl})
+    vim.api.nvim_win_set_hl_ns(win, ns)
     vim.api.nvim_buf_set_lines(buf, 0, #content, false, content)
     current_line = current_line + #content + 1
 
@@ -41,6 +43,7 @@ U.ui_notify = function(msg, level, lopts)
         if vim.api.nvim_win_is_valid(win) then vim.api.nvim_win_close(win, true) end
         if vim.api.nvim_buf_is_valid(win) then vim.api.nvim_buf_delete(buf, {force=true}) end
         current_line = current_line - #content - 1
+        vim.api.nvim_buf_clear_namespace(buf, ns, 0, -1)
     end, lopts.timeout or 5000)
 end
 
