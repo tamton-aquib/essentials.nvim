@@ -89,7 +89,7 @@ E.toggle_term = function(cmd, direction, close)
 end
 
 --> Run the current file according to filetype
----@param ht number: for height or "v" for vertical
+---@param ht? number for height or "v" for vertical
 E.run_file = function(ht)
     local fts = {
         rust       = "cargo run",
@@ -174,7 +174,7 @@ E.last_place = function()
 end
 
 --> Go to url under cursor (works on md links too)
----@param cmd string: the cli command to open browser. ex: "start","xdg-open"
+---@param cmd? string The cli command to open browser. ex: "start","xdg-open"
 E.go_to_url = function(cmd)
     local url = vim.fn.expand('<cfile>', nil, nil)
     if not url:match("http") then

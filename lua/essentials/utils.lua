@@ -13,7 +13,7 @@ end
 ---@param level number or vim.lsp.log_levels
 ---@param lopts table
 U.ui_notify = function(msg, level, lopts)
-    local content = vim.split(msg, '\n')
+    local content = vim.split(vim.trim(msg), '\n')
     lopts = lopts or {}
     local hl = log_levels[level] or "Hint"
 
@@ -34,7 +34,7 @@ U.ui_notify = function(msg, level, lopts)
     })
     vim.api.nvim_win_set_option(win, 'winhighlight', 'Normal:DiagnosticSign'..hl)
     vim.api.nvim_win_set_option(win, 'winhighlight', 'FloatBorder:DiagnosticSign'..hl)
-    vim.api.nvim_buf_set_lines(buf, 0, #content-1, false, content)
+    vim.api.nvim_buf_set_lines(buf, 0, #content, false, content)
     current_line = current_line + #content + 1
 
     vim.defer_fn(function()
@@ -122,7 +122,7 @@ U.ui_input = function(opts, callback)
     if opts.default then vim.api.nvim_put({opts.default}, "", true, true) end
     vim.cmd [[startinsert!]]
 
-    vim.keymap.set('i', '<CR>', function()
+    vim.keymap.set({'i', 'n'}, '<CR>', function()
         local content = vim.api.nvim_get_current_line()
         -- if opts.prompt then content = content:gsub(opts.prompt, '') end
         vim.cmd [[bd | stopinsert!]]
