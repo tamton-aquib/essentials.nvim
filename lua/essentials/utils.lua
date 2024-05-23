@@ -30,19 +30,19 @@ U.ui_notify = function(msg, level, lopts)
     maxlen = math.min(math.max(maxlen, 20), vim.o.columns-2)
 
     local win = vim.api.nvim_open_win(buf, false, {
-        relative='editor', style='minimal', border='rounded', noautocmd=true,
+        relative='editor', style='minimal', border='rounded', noautocmd=true, zindex=150,
         row=current_line, col=vim.o.columns-maxlen, width=maxlen, height=#content
     })
     vim.api.nvim_set_hl(ns, 'NormalFloat', {link="DiagnosticSign"..hl})
     vim.api.nvim_set_hl(ns, 'FloatBorder', {link="DiagnosticSign"..hl})
     vim.api.nvim_win_set_hl_ns(win, ns)
     vim.api.nvim_buf_set_lines(buf, 0, #content, false, content)
-    current_line = current_line + #content + 1
+    current_line = current_line + #content + 2
 
     vim.defer_fn(function()
         if vim.api.nvim_win_is_valid(win) then vim.api.nvim_win_close(win, true) end
         if vim.api.nvim_buf_is_valid(win) then vim.api.nvim_buf_delete(buf, {force=true}) end
-        current_line = current_line - #content - 1
+        current_line = current_line - #content - 2
         vim.api.nvim_buf_clear_namespace(buf, ns, 0, -1)
     end, lopts.timeout or 5000)
 end
