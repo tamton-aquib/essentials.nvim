@@ -103,7 +103,7 @@ U.ui_select = function(choices, opts, callback)
     end
 
     for i=1,#choices do
-        vim.api.nvim_buf_add_highlight(buf, 0, 'Identifier', i-1, 0, 3)
+        vim.hl.range(buf, ns, "Identifier", { i-1, 0 }, { i-1, tostring(i):len()+1 })
         vim.keymap.set('n', tostring(i), function() post_select(i) end)
     end
     vim.keymap.set('n', '<CR>', function() post_select(vim.api.nvim_win_get_cursor(0)[1]) end)
@@ -116,18 +116,18 @@ end
 -- TODO: prompt buf, prompt_setcallback() etc
 U.ui_input = function(opts, callback)
     local buf = vim.api.nvim_create_buf(false, true)
+    vim.bo[buf].ft = "prompt"
 
     vim.api.nvim_open_win(buf, true, {
         relative='cursor', style='minimal', border='single',
         row=1, col=1, width=opts.width or 20, height=1, title=opts.prompt
     })
     U.set_quit_maps()
-    if opts.default then vim.api.nvim_put({opts.default}, "", true, true) end
+    if opts.default and opts.default ~= "" then vim.api.nvim_put({ opts.default }, "", true, true) end
     vim.cmd [[startinsert!]]
 
     vim.keymap.set({'i', 'n'}, '<CR>', function()
         local content = vim.api.nvim_get_current_line()
-        -- if opts.prompt then content = content:gsub(opts.prompt, '') end
         vim.cmd [[bd | stopinsert!]]
         callback(vim.trim(content))
     end, {buffer=true, silent=true})
