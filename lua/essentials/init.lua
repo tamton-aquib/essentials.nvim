@@ -157,9 +157,24 @@ end
 
 --> A function to swap bools
 E.swap_bool = function()
-    local c = vim.api.nvim_get_current_line()
-    local subs = c:match("true") and c:gsub("true", "false") or c:gsub("false", "true")
-    vim.api.nvim_set_current_line(subs)
+	local c = vim.api.nvim_get_current_line()
+	local swaps = {
+		["true"] = "false",
+		["false"] = "true",
+		["light"] = "dark",
+		["dark"] = "light",
+		["yes"] = "no",
+		["no"] = "yes",
+		["0"] = "1",
+		["1"] = "0",
+	}
+	for k, v in pairs(swaps) do
+		if c:match("%f[%w]" .. k .. "%f[%W]") then
+			local subs = c:gsub("%f[%w]" .. k .. "%f[%W]", v, 1)
+			vim.api.nvim_set_current_line(subs)
+			return
+		end
+	end
 end
 
 ---> Go to last edited place
