@@ -30,7 +30,7 @@ U.ui_notify = function(msg, level, lopts)
     maxlen = math.min(math.max(maxlen, 20), vim.o.columns-2)
 
     local win = vim.api.nvim_open_win(buf, false, {
-        relative='editor', style='minimal', border='rounded', noautocmd=true, zindex=150,
+        relative='editor', style='minimal', border='single', noautocmd=true, zindex=150,
         row=current_line, col=vim.o.columns-maxlen, width=maxlen, height=#content
     })
     vim.api.nvim_set_hl(ns, 'NormalFloat', {link="DiagnosticSign"..hl})
@@ -91,7 +91,7 @@ U.ui_select = function(choices, opts, callback)
 
     local buf = vim.api.nvim_create_buf(false, true)
     vim.api.nvim_open_win(buf, true, {
-        style='minimal', border=o.border or 'double', relative='cursor',
+        style='minimal', border=o.border or 'single', relative='cursor',
         row=1, col=1, width=o.width or max+1, height=#choices, title=opts.prompt
     })
     vim.api.nvim_buf_set_lines(buf, 0, -1, false, titles)
